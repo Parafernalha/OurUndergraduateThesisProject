@@ -6,6 +6,9 @@ HardwareSerial SerialPort(2);
 const int Enable = 2;
 const int SlaveID = 1;
 String Temp = "Temperatura";
+String Humi = "Humidade";
+String Gas = "Gases";
+String Pre = "Pressao";
 
 void setup() 
 {
@@ -27,6 +30,9 @@ void loop()
   SerialPort.print(SlaveID);
   //SerialPort.print(" ");
   SerialPort.print(Temp);
+  SerialPort.print(Humi);
+  SerialPort.print(Gas);
+  SerialPort.print(Pre);
   //SerialPort.print("\n");
   SerialPort.flush();
 
