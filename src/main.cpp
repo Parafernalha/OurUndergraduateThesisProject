@@ -51,12 +51,96 @@ void loop()
                   Serial.println(temperature);
                   // Enable transmission mode
                   digitalWrite(Enable, HIGH);
-                  //SerialPort.print("Temperature: ");
+                  SerialPort.print("Temperature = ");
                   SerialPort.print(temperature);
+                  SerialPort.print(" ºC");
+                  SerialPort.flush();
+                  // Switch to receiving mode
+                  digitalWrite(Enable, LOW);}
+                
+                  else if(receivedMessage == "Humidade"){
+                    // Tell BME680 to begin measurement.
+                  bme.beginReading();
+                  delay(100);
+                  if (!bme.performReading()){
+                    Serial.println("Failed to perform reading :(");
+                    return;}
+                  float humidity = bme.humidity;
+                  Serial.println(humidity);
+                  // Enable transmission mode
+                  digitalWrite(Enable, HIGH);
+                  SerialPort.print("Humidity =  ");
+                  SerialPort.print(humidity);
+                  SerialPort.print(" %");
+                  SerialPort.flush();
+                  // Switch to receiving mode
+                  digitalWrite(Enable, LOW);}
+
+                   else if(receivedMessage == "Gases"){
+                    // Tell BME680 to begin measurement.
+                  bme.beginReading();
+                  delay(100);
+                  if (!bme.performReading()){
+                    Serial.println("Failed to perform reading :(");
+                    return;}
+                  float Gas = bme.gas_resistance;
+                  Serial.println(Gas);
+                  // Enable transmission mode
+                  digitalWrite(Enable, HIGH);
+                  SerialPort.print("Gas = ");
+                  SerialPort.print(Gas);
+                  SerialPort.print(" KOhms");
+                  SerialPort.flush();
+                  // Switch to receiving mode
+                  digitalWrite(Enable, LOW);}
+
+                  else if(receivedMessage == "Pressao"){
+                    // Tell BME680 to begin measurement.
+                  bme.beginReading();
+                  delay(100);
+                  if (!bme.performReading()){
+                    Serial.println("Failed to perform reading :(");
+                    return;}
+                  float Pre = bme.pressure;
+                  Serial.println(Pre);
+                  // Enable transmission mode
+                  digitalWrite(Enable, HIGH);
+                  SerialPort.print("Pressure: ");
+                  SerialPort.print(Pre);
+                  SerialPort.print(" hPa");
+                  SerialPort.flush();
+                  // Switch to receiving mode
+                  digitalWrite(Enable, LOW);}
+
+                  else if(receivedMessage = "TemperaturaHumidadeGasesPressao"){
+                  // Tell BME680 to begin measurement.
+                  bme.beginReading();
+                  delay(100);
+                  if (!bme.performReading()){
+                    Serial.println("Failed to perform reading :(");
+                    return;}
+                  float temperature = bme.temperature;
+                  float humidity = bme.humidity;
+                  float Gas = bme.gas_resistance;
+                  float Pre = bme.pressure;
+                  // Enable transmission mode
+                  digitalWrite(Enable, HIGH);
+                  SerialPort.print("Temperature = ");
+                  SerialPort.print(temperature);
+                  SerialPort.print(" ºC");
+                  SerialPort.print("Humidity =  ");
+                  SerialPort.print(humidity);
+                  SerialPort.print(" %");
+                  SerialPort.print("Pressure: ");
+                  SerialPort.print(Pre);
+                  SerialPort.print(" hPa");
+                  SerialPort.print("Gas = ");
+                  SerialPort.print(Gas);
+                  SerialPort.print(" KOhms");
                   SerialPort.flush();
                   // Switch to receiving mode
                   digitalWrite(Enable, LOW);
-         }
+        }
       }             
-  } 
+   } 
 }
