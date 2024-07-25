@@ -14,6 +14,8 @@ Adafruit_BME680 bme; // BME680 Instance
 const int Enable = 2;
 const int SlaveNumber = 1;
 int Slave;
+const int DebugLED = 14;
+bool sensorConnected = true;
 
 void sendSensorData(const char* key, float value) {
   StaticJsonDocument<200> doc;
@@ -27,17 +29,20 @@ void sendSensorData(const char* key, float value) {
   digitalWrite(Enable, LOW);
 }
 
-void setup() 
-{
+void setup() {
   Serial.begin(115200);
   SerialPort.begin(115200, SERIAL_8N1, 16, 17);
   pinMode(Enable, OUTPUT);
+  pinMode(DebugLED, OUTPUT);
   digitalWrite(Enable, LOW);
+  digitalWrite(DebugLED, LOW);
 
-  if (!bme.begin()) 
-  {
+  if (!bme.begin()) {
     Serial.println(F("Could not find a valid BME680 sensor, check wiring!"));
-    while (1);
+    digitalWrite(DebugLED, HIGH);
+    sensorConnected = false;
+  } else {
+    sensorConnected = true;
   }
 
   // Set up oversampling and filter initialization
@@ -48,8 +53,34 @@ void setup()
   bme.setGasHeater(320, 150); // 320*C for 150 ms
 }
 
-void loop() 
-{
+void checkSensorConnection() {
+  if (!sensorConnected || !bme.performReading()) {
+    Serial.println("Failed to perform reading or sensor disconnected :(");
+    digitalWrite(DebugLED, HIGH); // Acende o LED em caso de falha na leitura
+
+    // Tenta reinicializar o sensor
+    if (!bme.begin()) {
+      Serial.println(F("Could not reinitialize the BME680 sensor, check wiring!"));
+      sensorConnected = false;
+    } else {
+      Serial.println(F("BME680 sensor reinitialized successfully."));
+      digitalWrite(DebugLED, LOW);
+      sensorConnected = true;
+    }
+  } else {
+    digitalWrite(DebugLED, LOW); // Desliga o LED se a leitura for bem-sucedida
+    sensorConnected = true;
+  }
+}
+
+void loop() {
+  checkSensorConnection();
+
+  if (!sensorConnected) {
+    delay(1000); // Atraso para evitar tentativas rápidas de reconexão
+    return;
+  }
+
   digitalWrite(Enable, LOW);
   if (SerialPort.available()) {
     Slave = SerialPort.parseInt();
@@ -63,6 +94,7 @@ void loop()
         delay(100);
         if (!bme.performReading()) {
           Serial.println("Failed to perform reading :(");
+          digitalWrite(DebugLED, HIGH);
           return;
         }
         sendSensorData("Temperature", bme.temperature);
@@ -72,6 +104,7 @@ void loop()
         delay(100);
         if (!bme.performReading()) {
           Serial.println("Failed to perform reading :(");
+          digitalWrite(DebugLED, HIGH);
           return;
         }
         sendSensorData("Humidity", bme.humidity);
@@ -81,6 +114,7 @@ void loop()
         delay(100);
         if (!bme.performReading()) {
           Serial.println("Failed to perform reading :(");
+          digitalWrite(DebugLED, HIGH);
           return;
         }
         sendSensorData("Gas", bme.gas_resistance);
@@ -90,6 +124,7 @@ void loop()
         delay(100);
         if (!bme.performReading()) {
           Serial.println("Failed to perform reading :(");
+          digitalWrite(DebugLED, HIGH);
           return;
         }
         sendSensorData("Pressure", bme.pressure);
@@ -97,8 +132,9 @@ void loop()
       else if (receivedMessage == "TemperaturaHumidadeGasesPressao") {
         bme.beginReading();
         delay(100);
-        if (!bme.performReading()) {
+        if(!bme.performReading()){
           Serial.println("Failed to perform reading :(");
+          digitalWrite(DebugLED, HIGH);
           return;
         }
 
@@ -113,8 +149,9 @@ void loop()
         digitalWrite(Enable, HIGH);
         SerialPort.print(json);
         SerialPort.flush();
-        digitalWrite(Enable, LOW);
+        digitalWrite(Enable, LOW);     
       }
     }
   }
+  delay(500); // Pequeno atraso para não sobrecarregar o sensor e a comunicação
 }
