@@ -1,5 +1,9 @@
 #include <Arduino.h>
 #include <HardwareSerial.h>
+#include <Wire.h>
+#include <SPI.h>
+#include <Adafruit_Sensor.h>
+#include "Adafruit_BME680.h"
 
 HardwareSerial SerialPort(2);
 
@@ -26,14 +30,11 @@ void loop()
   digitalWrite(Enable, HIGH);
 
   // Send a test message to the slave
- 
   SerialPort.print(SlaveID);
-  //SerialPort.print(" ");
   SerialPort.print(Temp);
   SerialPort.print(Humi);
   SerialPort.print(Gas);
   SerialPort.print(Pre);
-  //SerialPort.print("\n");
   SerialPort.flush();
 
   // Switch to receiving mode
