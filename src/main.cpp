@@ -2,6 +2,8 @@
 #include <HardwareSerial.h>
 #include <Wire.h>
 #include <SPI.h>
+#include <Preferences.h>  // Include the Preferences library
+
 #define RELAY1_PIN  27
 #define RELAY2_PIN  26
 #define RELAY3_PIN  25
@@ -18,6 +20,8 @@ bool StatusRelay1;
 bool StatusRelay2;
 bool StatusRelay3;
 bool StatusRelay4;
+
+Preferences preferences;
 
 String Zone1_On = "Abrindo Portão da garagem"; //Example of use
 String Zone1_Off = "Fechando Portão da garagem"; //Example of use
@@ -47,6 +51,20 @@ void setup()
   // Initialize enable pin
   pinMode(ENABLE_PIN, OUTPUT);
   digitalWrite(ENABLE_PIN, LOW); // Disable transmission initially
+
+  // Open Preferences in read/write mode
+  preferences.begin("relay-states", false);
+
+  StatusRelay1 = preferences.getBool("relay1", false);
+  StatusRelay2 = preferences.getBool("relay2", false);
+  StatusRelay3 = preferences.getBool("relay3", false);
+  StatusRelay4 = preferences.getBool("relay4", false);
+
+  // Set relay pins to the retrieved state
+  digitalWrite(RELAY1_PIN, StatusRelay1 ? HIGH : LOW);
+  digitalWrite(RELAY2_PIN, StatusRelay2 ? HIGH : LOW);
+  digitalWrite(RELAY3_PIN, StatusRelay3 ? HIGH : LOW);
+  digitalWrite(RELAY4_PIN, StatusRelay4 ? HIGH : LOW);
 }
 
 void loop()
@@ -66,6 +84,7 @@ void loop()
                {
                 digitalWrite(RELAY1_PIN, HIGH);
                 StatusRelay1 = true;
+                preferences.putBool("relay1", StatusRelay1); // Save state
                 delay(100);
                 StaticJsonDocument<200> doc;
                 doc["dispositivo"] = ModuloRele;
@@ -84,6 +103,7 @@ void loop()
                {
                 digitalWrite(RELAY1_PIN, LOW);
                 StatusRelay1 = false;
+                preferences.putBool("relay1", StatusRelay1); // Save state
                 delay(100);
                 StaticJsonDocument<200> doc;
                 doc["dispositivo"] = ModuloRele;
@@ -102,6 +122,7 @@ void loop()
                {
                 digitalWrite(RELAY2_PIN, HIGH);
                 StatusRelay2 = true;
+                preferences.putBool("relay2", StatusRelay2); // Save state
                 delay(100);
                 StaticJsonDocument<200> doc;
                 doc["dispositivo"] = ModuloRele;
@@ -120,6 +141,7 @@ void loop()
                {
                 digitalWrite(RELAY2_PIN, LOW);
                 StatusRelay2 = false;
+                preferences.putBool("relay2", StatusRelay2); // Save state
                 delay(100);
                 StaticJsonDocument<200> doc;
                 doc["dispositivo"] = ModuloRele;
@@ -138,6 +160,7 @@ void loop()
                {
                 digitalWrite(RELAY3_PIN, HIGH);
                 StatusRelay3 = true;
+                preferences.putBool("relay3", StatusRelay3); // Save state
                 delay(100);
                 StaticJsonDocument<200> doc;
                 doc["dispositivo"] = ModuloRele;
@@ -156,6 +179,7 @@ void loop()
                {
                 digitalWrite(RELAY3_PIN, LOW);
                 StatusRelay3 = false;
+                preferences.putBool("relay3", StatusRelay3); // Save state
                 delay(100);
                 StaticJsonDocument<200> doc;
                 doc["dispositivo"] = ModuloRele;
@@ -174,6 +198,7 @@ void loop()
                {
                 digitalWrite(RELAY4_PIN, HIGH);
                 StatusRelay4 = true;
+                preferences.putBool("relay4", StatusRelay4); // Save state
                 delay(100);
                 StaticJsonDocument<200> doc;
                 doc["dispositivo"] = ModuloRele;
@@ -192,6 +217,7 @@ void loop()
                {
                 digitalWrite(RELAY4_PIN, LOW);
                 StatusRelay4 = false;
+                preferences.putBool("relay4", StatusRelay4); // Save state
                 delay(100);
                 StaticJsonDocument<200> doc;
                 doc["dispositivo"] = ModuloRele;
